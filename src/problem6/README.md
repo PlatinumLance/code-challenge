@@ -92,7 +92,34 @@ graph TB
   WS --> Metrics
 ```
 
-## API specification
+## API Endpoints
+
+### POST /actions/:action_id/complete
+
+### Description
+Records completed actions for authenticated users, update score atomically, and publishes an event.
+
+### Header
+Authorization: Bearer <jwt>
+
+### Request Body
+
+{
+    "request_id": "uuid-string"
+}
+
+### Response (200)
+{
+"user_id": "123",
+"new_score": 3200
+}
+
+### Error Responses
+
+- 400: invalid request_id
+- 401: invalid/missing token
+- 409: duplicate request (idempotency triggered)
+- 500: DB failure
 
 ### Authentication
 
