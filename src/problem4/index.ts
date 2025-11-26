@@ -1,7 +1,7 @@
 /*
     Complexity
     Time: O(n)
-    Space: O(n)
+    Space: O(1)
 */
 function sum_to_n_a (n: number) {
     let sum: number = 0;
