@@ -1,10 +1,10 @@
 import {Router, Request, Response} from "express";
-import {createResource, getResources, getResourceById, updateResource, deleteResource} from "../models/resource";
+import {createResource, getResources, getResourcesWithFilters, getResourceById, updateResource, deleteResource} from "../models/resource";
 
 const router = Router()
 
 // Create new resource
-router.post("/create", (req: Request, res: Response) => {
+router.post("/", (req: Request, res: Response) => {
     const { name, description } = req.body;
     if (!name) {
         return res.status(400).json({error: "Name must not be empty"});
@@ -14,13 +14,20 @@ router.post("/create", (req: Request, res: Response) => {
 });
 
 // Get list resource with option filters
-router.get("/get", (req: Request, res: Response) => {
-    const resources = getResources();
+router.get("/", (req: Request, res: Response) => {
+    const { name, description, search } = req.query;
+
+    const resources = getResourcesWithFilters({
+        name: typeof name === "string" ? name : undefined,
+        description: typeof description === "string" ? description : undefined,
+        search: typeof search === "string" ? search : undefined
+    });
+
     res.json(resources);
 });
 
 // Get resource by ID
-router.get("/get/:id", (req: Request, res: Response) => {
+router.get("/:id", (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
@@ -36,7 +43,7 @@ router.get("/get/:id", (req: Request, res: Response) => {
 });
 
 // Update resource
-router.put("/update/:id", (req: Request, res: Response) => {
+router.put("/:id", (req: Request, res: Response) => {
     const id = Number(req.params.id);
     const {name, description} = req.body;
     const resource = updateResource(id, {name, description});
@@ -47,15 +54,17 @@ router.put("/update/:id", (req: Request, res: Response) => {
 });
 
 // Delete resource
-router.delete("/delete/:id", (req: Request, res: Response) => {
+router.delete("/:id", (req: Request, res: Response) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
 
-    const resource = deleteResource(id);
-    if (!resource) return res.status(404).json({ error: "Resource not found" });
+    const result = deleteResource(id);
 
-    res.json({ message: "Resource deleted", resource });
+    if (result.changes === 0) {
+        return res.status(404).json({ error: "Resource not found" });
+    }
+
+    res.json({ message: "Resource deleted" });
 });
-
 
 export default router;
