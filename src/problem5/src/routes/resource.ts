@@ -1,5 +1,5 @@
 import {Router, Request, Response} from "express";
-import {createResource, getResources, getResourcesWithFilters, getResourceById, updateResource, deleteResource} from "../models/resource";
+import {createResource, getResourcesWithFilters, getResourceById, updateResource, deleteResource} from "../models/resource";
 
 const router = Router()
 
